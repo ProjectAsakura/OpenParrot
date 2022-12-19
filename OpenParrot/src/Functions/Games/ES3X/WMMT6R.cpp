@@ -565,6 +565,10 @@ static InitFunction Wmmt6RFunc([]()
 
 	// First auth error skip
 	injector::WriteMemory<BYTE>(imageBase + 0x71839B, 0xEB, true);
+	
+	// Best LAN setting by doomertheboomer
+	injector::WriteMemory<BYTE>(imageBase + 0xB0EB4A, 0xEB, true); //content router patch
+	injector::MakeNOP(imageBase + 0x7084A6, 2, true);
 
 	if (isTerminal)
 	{
@@ -578,9 +582,6 @@ static InitFunction Wmmt6RFunc([]()
 		// spam thread
 		//injector::MakeNOP(hook::get_pattern("74 ? 80 7B 31 00 75 ? 48 8B 43 10 80 78 31 00 75 1A 48 8B D8 48 8B 00 80 78 31 00 75 ? 48 8B D8"), 2); //this should be the terminal on same machine patch
 		
-		// Best LAN setting by doomertheboomer
-		injector::WriteMemory<BYTE>(imageBase + 0xB0EB4A, 0xEB, true); //content router patch
-		injector::MakeNOP(imageBase + 0x7084A6, 2, true);
 		injector::MakeNOP(hook::get_pattern("74 ? 80 7B 31 00 75 ? 48 8B 43 10 80 78 31 00 75 1A 48 8B D8 48 8B 00 80 78 31 00 75 ? 48 8B D8"), 2);
 	}
 
