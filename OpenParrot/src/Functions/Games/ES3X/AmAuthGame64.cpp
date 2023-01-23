@@ -394,11 +394,11 @@ int WSAAPI getaddrinfoHookAMAuth(PCSTR pNodeName, PCSTR pServiceName, const ADDR
 #endif
 	if (strcmp(pNodeName, "tenporouter.loc") == 0)
 	{
-		return g_origgetaddrinfoo(config["Network"]["RouterIP"].c_str(), pServiceName, pHints, ppResult);
+		return g_origgetaddrinfoo(config["General"]["NetworkAdapterIP"].c_str(), pServiceName, pHints, ppResult);
 	}
 	else if (strcmp(pNodeName, "bbrouter.loc") == 0)
 	{
-		return g_origgetaddrinfoo(config["Network"]["RouterIP"].c_str(), pServiceName, pHints, ppResult);
+		return g_origgetaddrinfoo(config["General"]["NetworkAdapterIP"].c_str(), pServiceName, pHints, ppResult);
 	}
 	else if (strcmp(pNodeName, "naominet.jp") == 0)
 	{

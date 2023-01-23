@@ -237,13 +237,13 @@ DNS_STATUS WINAPI DnsQuery_AHook(PCSTR pszName, WORD wType, DWORD Options, PVOID
 	if (strncmp(pszName, "tenporouter.loc", 15) == 0 || strncmp(pszName, "bbrouter.loc", 15) == 0)
 	{
 		// TODO: make this configurable?
-		const char* dnsName = config["Network"]["RouterIP"].c_str();
+		const char* dnsName = config["General"]["NetworkAdapterIP"].c_str();
 
 		return g_origDnsQuery_A(dnsName, wType, Options, pExtra, ppQueryResults, pReserved);
 	}
 	if (strncmp(pszName, "naominet.jp", 15) == 0)
 	{
-		const char* serverName = config["Network"]["ServerIP"].c_str();
+		const char* serverName = config["General"]["NetworkAdapterIP"].c_str();
 
 		return g_origDnsQuery_A(serverName, wType, Options, pExtra, ppQueryResults, pReserved);
 	}
