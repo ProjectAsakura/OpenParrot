@@ -581,7 +581,7 @@ static InitFunction Wmmt6Func([]()
 
 	puts("hello there, maxitune");
 
-	Sleep(2000); // delay to make sure amauth running first
+	Sleep(1000); // delay to make sure amauth running first
 
 	// folder for path redirections
 	prepareCerts();
