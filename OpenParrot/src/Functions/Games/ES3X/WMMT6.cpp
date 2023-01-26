@@ -560,6 +560,8 @@ static void prepareCerts()
 
 static InitFunction Wmmt6Func([]()
 {
+	Sleep(1500); // delay to make sure amauth running first
+
 	// Alloc debug console
 	FreeConsole();
 	AllocConsole();
@@ -580,8 +582,6 @@ static InitFunction Wmmt6Func([]()
 	std::wcin.clear();
 
 	puts("hello there, maxitune");
-
-	Sleep(1000); // delay to make sure amauth running first
 
 	// folder for path redirections
 	prepareCerts();
