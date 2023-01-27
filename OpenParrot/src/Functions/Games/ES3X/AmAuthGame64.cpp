@@ -438,11 +438,11 @@ static void prepareWMMT()
 		MoveFile(L"AMConfig.ini", L"AMConfig.ini.orig");
 		FILE* file2 = fopen("AMConfig.ini", "wb");
 
-		if (newCrcResult == 0x7e804704) // MT6
+		if (newCrcResult == 0x7E804704) // MT6
 		{
 			fwrite(AMConfig, 1, sizeof(AMConfig), file2);
 		}
-		else if (newCrcResult == 0xd3c50453) // MT6R
+		else if (newCrcResult == 0xD3C50453) // MT6R
 		{
 			fwrite(AMConfig_6R, 1, sizeof(AMConfig_6R), file2);
 		}
@@ -459,11 +459,11 @@ static void prepareWMMT()
 	{
 		FILE* writecon = fopen("WritableConfig.ini", "wb");
 
-		if (newCrcResult == 0x7e804704) // MT6
+		if (newCrcResult == 0x7E804704) // MT6
 		{
 			fwrite(WritableConfig, 1, sizeof(WritableConfig), writecon);
 		}
-		else if (newCrcResult == 0xd3c50453) // MT6R
+		else if (newCrcResult == 0xD3C50453) // MT6R
 		{
 			fwrite(WritableConfig_6R, 1, sizeof(WritableConfig_6R), writecon);
 		}
@@ -476,7 +476,7 @@ static void prepareWMMT()
 	static uintptr_t imageBase;
 	imageBase = (uintptr_t)GetModuleHandleA(0);
 
-	if (newCrcResult == 0x7e804704) // MT6
+	if (newCrcResult == 0x7E804704) // MT6
 	{
 		injector::MakeNOP(imageBase + 0x3BB3, 2, true);
 		injector::MakeNOP(imageBase + 0x3BB4, 2, true);
@@ -485,7 +485,7 @@ static void prepareWMMT()
 		injector::MakeNOP(imageBase + 0x3BB7, 2, true);
 		injector::MakeNOP(imageBase + 0x3BB8, 2, true);
 	}
-	else if (newCrcResult == 0xd3c50453) // MT6R
+	else if (newCrcResult == 0xD3C50453) // MT6R
 	{
 		injector::MakeNOP(imageBase + 0x5120, 2, true);
 		injector::MakeNOP(imageBase + 0x5121, 2, true);
@@ -509,9 +509,9 @@ static void prepareWMMT()
 
 	// downloadorder
 	char dlOrderStr[2048];
-	strcat(powerOnStr, "https://");
-	strcat(powerOnStr, localhost);
-	strcat(powerOnStr, "/allnet/downloadorder");
+	strcat(dlOrderStr, "https://");
+	strcat(dlOrderStr, localhost);
+	strcat(dlOrderStr, "/allnet/downloadorder");
 	dlOrder = dlOrderStr;
 	*/
 }
@@ -520,7 +520,7 @@ static void runMaxiTerminal()
 {
 	if (ToBool(config["Terminal"]["Run MaxiTerminal"]))
 	{
-		std::string path = config["Terminal"]["MaxiTerminal Executable (start.bat)"];
+		std::string path = "\"" +config["Terminal"]["MaxiTerminal Executable (start.bat)"]+ "\"";
 		const char* passbuf = path.c_str();
 
 		DWORD FindProcessId(const std::wstring & processName);
@@ -597,14 +597,14 @@ static InitFunction HookAmAuthD64([]()
 	{
 		// write config files for mt6
 		prepareWMMT();
-dllreg();
-MH_Initialize();
-MH_CreateHookApi(L"kernel32.dll", "SetSystemTime", SetSystemTimeHook, (void**)&orig_SetSystemTime);
-MH_CreateHookApi(L"ws2_32.dll", "getaddrinfo", getaddrinfoHookAMAuth, (void**)&g_origgetaddrinfoo);
-MH_CreateHookApi(L"ws2_32.dll", "htons", htonsHook, (void**)&htons_orig);
-MH_CreateHookApi(L"iphlpapi.dll", "GetRTTAndHopCount", GetRTTAndHopCountStubAM, NULL);
-MH_EnableHook(MH_ALL_HOOKS);
-runMaxiTerminal();
+		dllreg();
+		MH_Initialize();
+		MH_CreateHookApi(L"kernel32.dll", "SetSystemTime", SetSystemTimeHook, (void**)&orig_SetSystemTime);
+		MH_CreateHookApi(L"ws2_32.dll", "getaddrinfo", getaddrinfoHookAMAuth, (void**)&g_origgetaddrinfoo);
+		MH_CreateHookApi(L"ws2_32.dll", "htons", htonsHook, (void**)&htons_orig);
+		MH_CreateHookApi(L"iphlpapi.dll", "GetRTTAndHopCount", GetRTTAndHopCountStubAM, NULL);
+		MH_EnableHook(MH_ALL_HOOKS);
+		runMaxiTerminal();
 	}, GameID::AmAuthD64);
 #pragma optimize("", on)
 #endif
