@@ -811,6 +811,13 @@ static InitFunction Wmmt6RFunc([]()
 	// Alloc debug console
 	FreeConsole();
 	AllocConsole();
+	
+#ifdef NDEBUG
+	// Hide the debug console
+	mt6Hwnd = FindWindowA("ConsoleWindowClass", NULL);
+	ShowWindow(mt6Hwnd, 0);
+#endif
+
 	SetConsoleTitle(L"Maxitune6R Console");
 
 	FILE* pNewStdout = nullptr;

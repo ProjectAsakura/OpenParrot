@@ -207,46 +207,23 @@ static LRESULT Hook_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (!gotWindowSize)
 	{
-		displaySizeX = GetSystemMetrics(SM_CXSCREEN);
-		displaySizeY = GetSystemMetrics(SM_CYSCREEN);
-		scaleFactorX = static_cast<float>(displaySizeX) / 1360.0f;
-		scaleFactorY = static_cast<float>(displaySizeY) / 768.0f;
-		printf("display is %dx%d (scale factor of %f, %f)\n", displaySizeX, displaySizeY, scaleFactorX, scaleFactorY);
+		mt6SetDisplayParams(hwnd);
 		gotWindowSize = TRUE;
 	}
 
-	// TODO: Port below to use updated MT6 code
-	/*
 	if (msg == WM_LBUTTONDOWN ||
 		msg == WM_LBUTTONUP)
 	{
-		unsigned short mx = GET_X_LPARAM(lParam);
-		unsigned short my = GET_Y_LPARAM(lParam);
-
-		//unsigned short trueMy = 768 - my;
-
-		float scaledMx = static_cast<float>(mx) / 1360.f;
-		float scaledMy = static_cast<float>(my) / 768.f;
-
-		scaledMy = 1.0f - scaledMy;
-
-		scaledMx *= scaleFactorX;
-		scaledMy *= scaleFactorY;
-
-		unsigned short trueMx = static_cast<int>(scaledMx * 16383.0f);
-		unsigned short trueMy = static_cast<int>(scaledMy * 16383.0f);
-		trueMy += 9500; // Cheap hack, todo do the math better!!
-
-		//mx *= (16383 / 1360);
-		//trueMy *= (16383 / 1360);
-
-		printf("%d %d\n", trueMx, trueMy);
-		mt6SetTouchParams(trueMx, trueMy, msg == WM_LBUTTONDOWN);
-
-		printf("MOUSE %s (%d, %d)\n", msg == WM_LBUTTONDOWN ? "DOWN" : "UP  ", mx, my);
+		mt6SetTouchData(lParam, msg == WM_LBUTTONDOWN, false);
 		return 0;
 	}
-	*/
+
+	if (msg == WM_POINTERDOWN ||
+		msg == WM_POINTERUP)
+	{
+		mt6SetTouchData(lParam, msg == WM_POINTERDOWN, true);
+		return 0;
+	}
 
 	return pMaxituneWndProc(hwnd, msg, wParam, lParam);
 }
@@ -310,6 +287,13 @@ static InitFunction Wmmt5Func([]()
 	// Alloc debug console
 	FreeConsole();
 	AllocConsole();
+
+#ifdef NDEBUG
+	// Hide the debug console
+	mt6Hwnd = FindWindowA("ConsoleWindowClass", NULL);
+	ShowWindow(mt6Hwnd, 0);
+#endif
+
 	SetConsoleTitle(L"Maxitune5 Console");
 
 	FILE* pNewStdout = nullptr;
