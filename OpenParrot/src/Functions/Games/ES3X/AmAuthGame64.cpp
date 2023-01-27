@@ -472,7 +472,7 @@ static void prepareWMMT()
 		return;
 	}
 
-	/* maybe useless, and wrong too lmao
+	// maybe useless, and wrong too lmao
 	static uintptr_t imageBase;
 	imageBase = (uintptr_t)GetModuleHandleA(0);
 
@@ -495,6 +495,7 @@ static void prepareWMMT()
 		injector::MakeNOP(imageBase + 0x5125, 2, true);
 	}
 
+	/*
 	// Set IP hooks
 	std::string gameURL = config["General"]["Game URL"];
 	localhost = gameURL.c_str();

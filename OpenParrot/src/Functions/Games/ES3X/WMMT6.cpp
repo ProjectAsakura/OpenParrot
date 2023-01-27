@@ -560,8 +560,6 @@ static void prepareCerts()
 
 static InitFunction Wmmt6Func([]()
 {
-	Sleep(1500); // delay to make sure amauth running first
-
 	// Alloc debug console
 	FreeConsole();
 	AllocConsole();
@@ -586,20 +584,6 @@ static InitFunction Wmmt6Func([]()
 	// folder for path redirections
 	prepareCerts();
 	CreateDirectoryA(".\\TP", nullptr);
-
-	/*
-	FILE* fileF = _wfopen(L".\\TP\\setting.lua.gz", L"r");
-	if (fileF == NULL)
-	{
-		FILE* settingsF = _wfopen(L".\\TP\\setting.lua.gz", L"wb");
-		fwrite(settingData, 1, sizeof(settingData), settingsF);
-		fclose(settingsF);
-	}
-	else
-	{
-		fclose(fileF);
-	}
-	*/
 
 	bool isTerminal = false;
 	if (ToBool(config["General"]["TerminalMode"]))
@@ -680,22 +664,6 @@ static InitFunction Wmmt6Func([]()
 	{
 		// Terminal on same machine check.
 		injector::MakeNOP(hook::get_pattern("74 ? 80 7B 31 00 75 ? 48 8B 43 10 80 78 31 00 75 1A 48 8B D8 48 8B 00 80 78 31 00 75 ? 48 8B D8"), 2);
-
-		/*
-		injector::WriteMemory<WORD>(imageBase + 0x6A0C87, 0x00D1, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x20B88A, 0x90, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x20B88B, 0x90, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x20B89B, 0x90, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x20B89C, 0x90, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x20B8A1, 0x90, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x20B8A2, 0x90, true);
-
-		// spam thread
-		if (ToBool(config["General"]["TerminalEmulator"]))
-		{
-			CreateThread(0, 0, SpamMulticast, 0, 0, 0);
-		}
-		*/
 	}
 
 	// path fixes
@@ -749,188 +717,6 @@ static InitFunction Wmmt6Func([]()
 	injector::WriteMemoryRaw(imageBase + 0x1401DDC, "TP", 2, true); // F:
 	injector::WriteMemoryRaw(imageBase + 0x13652B8, "TP", 2, true);
 	injector::WriteMemoryRaw(imageBase + 0x1365AC8, "TP", 2, true);
-
-	std::string value = config["General"]["CustomName"];
-	if (!value.empty())
-	{
-		/*
-		if (value.size() > 5)
-		{
-			memset(customName, 0, 256);
-			strcpy(customName, value.c_str());
-			CreateThread(0, 0, SpamCustomName, 0, 0, 0);
-		}
-
-		injector::WriteMemory<BYTE>(imageBase + 0x10942E8, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F5428, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB0, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A0, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE688, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF0, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C00, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C10, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10942EA, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F542A, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB2, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A2, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE68A, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF2, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C02, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C12, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10942EC, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F542C, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB4, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A4, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE68C, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF4, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C04, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C14, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10942EE, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F542E, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB6, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A6, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE68E, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF6, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C06, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C16, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10942F0, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F5430, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB8, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A8, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE690, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF8, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C08, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C18, 0xFF, true);
-
-		char NameChar;
-		for (int i = 0; i < value.size(); i++) {
-			NameChar = value.at(i) - 0x20;
-
-			switch (i)
-			{
-			case 0x00:
-				injector::WriteMemory<BYTE>(imageBase + 0x10942E8, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x10F5428, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B3EB0, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B75A0, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12CE688, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4BF0, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C00, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C10, NameChar, true);
-				break;
-			case 0x01:
-				injector::WriteMemory<BYTE>(imageBase + 0x10942EA, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x10F542A, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B3EB2, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B75A2, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12CE68A, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4BF2, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C02, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C12, NameChar, true);
-				break;
-			case 0x02:
-				injector::WriteMemory<BYTE>(imageBase + 0x10942EC, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x10F542C, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B3EB4, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B75A4, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12CE68C, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4BF4, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C04, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C14, NameChar, true);
-				break;
-			case 0x03:
-				injector::WriteMemory<BYTE>(imageBase + 0x10942EE, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x10F542E, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B3EB6, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B75A6, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12CE68E, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4BF6, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C06, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C16, NameChar, true);
-				break;
-			case 0x04:
-				injector::WriteMemory<BYTE>(imageBase + 0x10942F0, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x10F5430, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B3EB8, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12B75A8, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x12CE690, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4BF8, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C08, NameChar, true);
-				injector::WriteMemory<BYTE>(imageBase + 0x13C4C18, NameChar, true);
-				break;
-			}
-		}
-		injector::WriteMemory<BYTE>(imageBase + 0x10942E9, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10942EB, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10942ED, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10942EF, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10942F1, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F5429, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F542B, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F542D, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F542F, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x10F5431, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB1, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB3, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB5, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB7, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B3EB9, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A1, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A3, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A5, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A7, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12B75A9, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE689, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE68B, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE68D, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE68F, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x12CE691, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF1, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF3, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF5, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF7, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4BF9, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C01, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C03, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C05, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C07, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C09, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C11, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C13, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C15, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C17, 0xFF, true);
-		injector::WriteMemory<BYTE>(imageBase + 0x13C4C19, 0xFF, true);
-		*/
-	}
-
-	ForceFullTune = (ToBool(config["Tune"]["Force Full Tune"]));
-	ForceNeon = (ToBool(config["Tune"]["Force Neon"]));
-
-	if (ForceNeon)
-	{
-		/*
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Green") == 0)
-			NeonColour = 0x01;
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Blue") == 0)
-			NeonColour = 0x02;
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Red") == 0)
-			NeonColour = 0x03;
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Yellow") == 0)
-			NeonColour = 0x04;
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Purple") == 0)
-			NeonColour = 0x05;
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Green Pattern") == 0)
-			NeonColour = 0x06;
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Blue Pattern") == 0)
-			NeonColour = 0x07;
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Red Pattern") == 0)
-			NeonColour = 0x08;
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Yellow Pattern") == 0)
-			NeonColour = 0x09;
-		if (strcmp(config["Tune"]["Select Neon"].c_str(), "Purple Pattern") == 0)
-			NeonColour = 0x0A;
-		*/
-	}
 
 	// Fix dongle error (can be triggered by various USB hubs, dongles
 	injector::MakeNOP(imageBase + 0x8C140F, 2, true);

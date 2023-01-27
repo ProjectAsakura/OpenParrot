@@ -808,8 +808,6 @@ static void prepareCerts()
 
 static InitFunction Wmmt6RFunc([]()
 {
-	Sleep(1500); // delay to make sure amauth running first
-
 	// Alloc debug console
 	FreeConsole();
 	AllocConsole();
