@@ -4,6 +4,10 @@
 #include "MinHook.h"
 #include <Utility/Hooking.Patterns.h>
 #include <thread>
+#include <iostream>
+#include <Windowsx.h>
+#include <Utility/TouchSerial/MT6.h>
+#include <fstream>
 #ifdef _M_AMD64
 
 #pragma optimize("", off)
@@ -401,6 +405,62 @@ static unsigned int Hook_hasp_read(int hasp_handle, int hasp_fileid, unsigned in
 
 static unsigned int Hook_hasp_write(int hasp_handle, int hasp_fileid, unsigned int offset, unsigned int length, unsigned char* buffer) {
 	return HASP_STATUS_OK;
+}
+
+static HWND mt6Hwnd;
+
+typedef BOOL(WINAPI* ShowWindow_t)(HWND, int);
+static ShowWindow_t pShowWindow;
+
+
+// Hello Win32 my old friend...
+typedef LRESULT(WINAPI* WindowProcedure_t)(HWND, UINT, WPARAM, LPARAM);
+static WindowProcedure_t pMaxituneWndProc;
+
+static BOOL gotWindowSize = FALSE;
+static unsigned displaySizeX = 0;
+static unsigned displaySizeY = 0;
+static float scaleFactorX = 0.0f;
+static float scaleFactorY = 0.0f;
+
+static LRESULT Hook_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (!gotWindowSize)
+	{
+		mt6SetDisplayParams(hwnd);
+		gotWindowSize = TRUE;
+	}
+
+	if (msg == WM_LBUTTONDOWN ||
+		msg == WM_LBUTTONUP)
+	{
+		mt6SetTouchData(lParam, msg == WM_LBUTTONDOWN, false);
+		return 0;
+	}
+
+	if (msg == WM_POINTERDOWN ||
+		msg == WM_POINTERUP)
+	{
+		mt6SetTouchData(lParam, msg == WM_POINTERDOWN, true);
+		return 0;
+	}
+
+	return pMaxituneWndProc(hwnd, msg, wParam, lParam);
+}
+
+static BOOL Hook_ShowWindow(HWND hwnd, int nCmdShow)
+{
+	SetWindowLongPtrW(hwnd, -4, (LONG_PTR)Hook_WndProc);
+	ShowCursor(1);
+
+	mt6Hwnd = hwnd;
+	return pShowWindow(hwnd, nCmdShow);
+}
+
+typedef void (WINAPI* OutputDebugStringA_t)(LPCSTR);
+static void Hook_OutputDebugStringA(LPCSTR str)
+{
+	printf("debug> %s", str);
 }
 
 typedef int (WINAPI *BIND)(SOCKET, CONST SOCKADDR *, INT);
@@ -852,6 +912,32 @@ static DWORD WINAPI Wmmt5FfbCollector(void* ctx)
 
 static InitFunction Wmmt5DXFunc([]()
 {
+	// Alloc debug console
+	FreeConsole();
+	AllocConsole();
+
+#ifdef NDEBUG
+	// Hide the debug console
+	mt6Hwnd = FindWindowA("ConsoleWindowClass", NULL);
+	ShowWindow(mt6Hwnd, 0);
+#endif
+
+	SetConsoleTitle(L"Maxitune5DX Console");
+
+	FILE* pNewStdout = nullptr;
+	FILE* pNewStderr = nullptr;
+	FILE* pNewStdin = nullptr;
+
+	::freopen_s(&pNewStdout, "CONOUT$", "w", stdout);
+	::freopen_s(&pNewStderr, "CONOUT$", "w", stderr);
+	::freopen_s(&pNewStdin, "CONIN$", "r", stdin);
+	std::cout.clear();
+	std::cerr.clear();
+	std::cin.clear();
+	std::wcout.clear();
+	std::wcerr.clear();
+	std::wcin.clear();
+
 	// folder for path redirections
 	CreateDirectoryA(".\\OpenParrot", nullptr);
 
@@ -972,21 +1058,14 @@ static InitFunction Wmmt5DXFunc([]()
 			}
 		}
 	}
-
+	
+	/*
 	if (ToBool(config["General"]["SkipMovies"]))
 	{
 		// Skip movies fuck you wmmt5
 		safeJMP(imageBase + 0x85D7A0, ReturnTrue);
 	}
-
-
-	std::string value = config["General"]["CustomName"];
-	if (!value.empty())
-	{
-		memset(customName, 0, 256);
-		strcpy(customName, value.c_str());
-		//CreateThread(0, 0, SpamCustomName, 0, 0, 0);
-	}
+	*/
 
 	MH_EnableHook(MH_ALL_HOOKS);
 

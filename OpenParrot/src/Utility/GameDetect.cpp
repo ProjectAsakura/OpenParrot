@@ -472,13 +472,13 @@ void GameDetect::DetectCurrentGame()
 				{
 					SetGameId(GameID::WMMT6R, "WMMT6R");
 				}
-				else 
+				else
 				{
 					SetGameId(GameID::WMMT5, "WMMT5 Update 10-21");
 				}
 				break;
 			}
-			
+
 		}
 #endif
 		switch (newCrcResult)
@@ -681,7 +681,7 @@ void GameDetect::DetectCurrentGame()
 #ifdef _AMD64_
 		case 0xf322d053:
 			SetGameId(GameID::SFV, "SFV");
-			break;				  
+			break;
 		case 0x80ebd207:
 			SetGameId(GameID::Theatrhythm, "Theatrhythm");
 			break;
@@ -822,6 +822,10 @@ void GameDetect::DetectCurrentGame()
 		case 0xd1707347: // Base
 		case 0xc20612d0: // Patched Base
 			SetGameId(GameID::UmifreshTest, "Umihara KawaseFresh! For AC Test Menu");
+			break;
+		case 0x7E804704: // MT6
+		case 0xD3C50453: // MT6R
+			SetGameId(GameID::AmAuthD64, "AMAuthd for WMMT");
 			break;
 #endif
 		default:
